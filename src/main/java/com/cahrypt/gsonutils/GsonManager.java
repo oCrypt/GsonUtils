@@ -19,6 +19,11 @@ public class GsonManager {
     private final Map<Object, Type> adapters;
     private Gson gson;
 
+    public GsonManager(Gson gson) {
+        this.adapters = new HashMap<>();
+        this.gson = gson;
+    }
+
     public GsonManager(boolean cache) {
         this.adapters = new HashMap<>();
 
