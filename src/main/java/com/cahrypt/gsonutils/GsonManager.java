@@ -8,8 +8,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -142,6 +145,36 @@ public final class GsonManager {
         }
 
         return object;
+    }
+
+    /**
+     * Deserializes an object from an API endpoint.
+     * @param type The type of the object.
+     * @param connection The connection to the endpoint.
+     * @param <T> The type of the object.
+     * @return The deserialized object.
+     * @throws IOException If an I/O error occurs.
+     */
+    public <T> T fromEndpoint(Class<T> type, HttpURLConnection connection) throws IOException {
+        connection.setRequestMethod("GET");
+
+        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            return null;
+        }
+
+        return gson.fromJson(new InputStreamReader(connection.getInputStream()), type);
+    }
+
+    /**
+     * Deserializes an object from an API endpoint.
+     * @param type The type of the object.
+     * @param endpointURL The URL of the endpoint.
+     * @param <T> The type of the object.
+     * @return The deserialized object.
+     * @throws IOException If an I/O error occurs.
+     */
+    public <T> T fromEndpoint(Class<T> type, String endpointURL) throws IOException {
+        return fromEndpoint(type, (HttpURLConnection) new URL(endpointURL).openConnection());
     }
 
     /**
