@@ -81,14 +81,12 @@ public final class GsonManager {
         File parent = file.getParentFile();
 
         if (!parent.exists() && !file.getParentFile().mkdirs()) {
-            System.out.println("Failed to create parent directories");
-            return null;
+            throw new RuntimeException("Failed to create parent directories");
         }
 
         try {
             if (!file.createNewFile()) {
-                System.out.println("Failed to create file " + fileName);
-                return null;
+                throw new RuntimeException("Failed to create file " + fileName);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -187,8 +185,7 @@ public final class GsonManager {
         File file = getFile(fileName);
 
         if (file == null) {
-            System.out.println("Failed to create file");
-            return;
+            throw new RuntimeException("Failed to create file " + fileName);
         }
 
         toFile(object, type, file);
