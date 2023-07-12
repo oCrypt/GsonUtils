@@ -71,7 +71,7 @@ public final class GsonManager {
         this(true);
     }
 
-    private File getFile(String fileName) {
+    private File getFile(String fileName) throws IOException {
         File file = new File(fileName);
 
         if (file.exists()) {
@@ -84,13 +84,8 @@ public final class GsonManager {
             throw new RuntimeException("Failed to create parent directories");
         }
 
-        try {
-            if (!file.createNewFile()) {
-                throw new RuntimeException("Failed to create file " + fileName);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+        if (!file.createNewFile()) {
+            throw new RuntimeException("Failed to create file " + fileName);
         }
 
         return file;
@@ -116,14 +111,8 @@ public final class GsonManager {
      * @param <T> The type of the object.
      * @return The deserialized object.
      */
-    public <T> T fromFile(Class<T> type, String fileName) {
-        File file = getFile(fileName);
-
-        if (file == null) {
-            return null;
-        }
-
-        return fromFile(type, file);
+    public <T> T fromFile(Class<T> type, String fileName) throws IOException {
+        return fromFile(type, getFile(fileName));
     }
 
     /**
@@ -181,14 +170,8 @@ public final class GsonManager {
      * @param type The type of the object.
      * @param fileName The name of the file to serialize to (will be created if non-existent).
      */
-    public void toFile(Object object, Type type, String fileName) {
-        File file = getFile(fileName);
-
-        if (file == null) {
-            throw new RuntimeException("Failed to create file " + fileName);
-        }
-
-        toFile(object, type, file);
+    public void toFile(Object object, Type type, String fileName) throws IOException {
+        toFile(object, type, getFile(fileName));
     }
 
     /**
@@ -197,17 +180,13 @@ public final class GsonManager {
      * @param type The type of the object.
      * @param file The file to serialize to (expected to exist).
      */
-    public void toFile(Object object, Type type, File file) {
-        try {
-            FileWriter writer = new FileWriter(file);
+    public void toFile(Object object, Type type, File file) throws IOException {
+        FileWriter writer = new FileWriter(file);
 
-            String jsonString = gson.toJson(object, type);
+        String jsonString = gson.toJson(object, type);
 
-            writer.write(jsonString);
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        writer.write(jsonString);
+        writer.close();
     }
 
     /**
